@@ -1,0 +1,43 @@
+---
+- name: Deploy infrastructure stack
+  hosts: prod
+  become: yes
+
+  tasks:
+    - name: Create config directory
+      file:
+        path: /opt/infrastructure
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0755'
+
+    - name: Copy compose and config files
+      copy:
+        src: "{{ item }}"
+        dest: /opt/infrastructure/
+        mode: '0644'
+      loop:
+        - ../files/docker-compose.infra.yml
+        - ../files/prometheus.yml
+        - ../files/filebeat.yml
+
+    - name: Copy backup script
+      copy:
+        src: ../files/backup.sh
+        dest: /usr/local/bin/backup.sh
+        mode: '0755'
+
+    - name: Schedule daily database backup
+      cron:
+        name: "pg_backup"
+        minute: "0"
+        hour: "3"
+        job: "/usr/local/bin/backup.sh >> /var/log/backup.log 2>&1"
+        user: root
+
+    - name: Start infrastructure services
+      command: >
+        docker compose
+        -f /opt/infrastructure/docker-compose.infra.yml
+        up -d
