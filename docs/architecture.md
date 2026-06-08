@@ -59,7 +59,7 @@ graph TD
 ### 2.3 База данных (PostgreSQL)
 *   **Роль**: Основное хранилище данных.
 *   **Задача**: Сохранение состояния приложения. 
-*   **Резервное копирование**: Скрипт [backup.sh](file:///D:/infrastructure-blueprint/ansible/files/backup.sh) запускается по расписанию через cron на хосте, делает сжатый дамп базы и удаляет старые копии.
+*   **Резервное копирование**: Скрипт [backup.sh](../ansible/files/backup.sh) запускается по расписанию через cron на хосте, делает сжатый дамп базы и удаляет старые копии.
 
 ### 2.4 Стек мониторинга (Prometheus + Grafana + Node Exporter)
 *   **Node Exporter**: Собирает метрики процессора, памяти и диска самого сервера.
@@ -77,8 +77,8 @@ graph TD
 
 ### 3.1 Подготовка серверов (Ansible)
 Для управления инфраструктурой я написал два Ansible-плейбука:
-*   [setup_server.yml](file:///D:/infrastructure-blueprint/ansible/playbooks/setup_server.yml) — выполняет первоначальную подготовку чистого сервера (устанавливает Docker, настраивает параметры ядра для Elasticsearch, создает общую сеть `app-network`).
-*   [deploy_infra.yml](file:///D:/infrastructure-blueprint/ansible/playbooks/deploy_infra.yml) — копирует конфигурации и развертывает инфраструктурный стек.
+*   [setup_server.yml](../ansible/playbooks/setup_server.yml) — выполняет первоначальную подготовку чистого сервера (устанавливает Docker, настраивает параметры ядра для Elasticsearch, создает общую сеть `app-network`).
+*   [deploy_infra.yml](../ansible/playbooks/deploy_infra.yml) — копирует конфигурации и развертывает инфраструктурный стек.
 
 ### 3.2 Доставка кода (GitLab CI/CD)
 *   При каждом пуше в ветку `main` запускается пайплайн.

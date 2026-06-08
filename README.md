@@ -48,7 +48,7 @@ graph TD
 - **Ansible** отвечает за подготовку инфраструктуры хоста: установку Docker, создание общей сети, размещение конфигурационных файлов мониторинга и логирования, а также запуск базового стека.
 - **GitLab CI/CD** обеспечивает непрерывную сборку и деплой веб-приложения при каждом коммите в ветку `main`.
 
-Для подробного ознакомления с архитектурой см. файл [architecture.md](file:///D:/infrastructure-blueprint/docs/architecture.md).
+Для подробного ознакомления с архитектурой см. файл [architecture.md](./docs/architecture.md).
 
 ---
 
@@ -101,17 +101,17 @@ ansible-playbook -i ansible/inventory/hosts.ini ansible/playbooks/deploy_infra.y
 ## Подробное описание компонентов
 
 ### Ansible: подготовка серверов
-*   [setup_server.yml](file:///D:/infrastructure-blueprint/ansible/playbooks/setup_server.yml): Одноразовый плейбук, который устанавливает пакеты Docker Engine, добавляет текущего пользователя в группу `docker`, настраивает параметр `vm.max_map_count` для Elasticsearch и создает общую Docker-сеть `app-network`.
-*   [deploy_infra.yml](file:///D:/infrastructure-blueprint/ansible/playbooks/deploy_infra.yml): Копирует файлы настроек, настраивает ежедневное резервное копирование БД в cron и запускает Docker Compose стек инфраструктуры.
+*   [setup_server.yml](./ansible/playbooks/setup_server.yml): Одноразовый плейбук, который устанавливает пакеты Docker Engine, добавляет текущего пользователя в группу `docker`, настраивает параметр `vm.max_map_count` для Elasticsearch и создает общую Docker-сеть `app-network`.
+*   [deploy_infra.yml](./ansible/playbooks/deploy_infra.yml): Копирует файлы настроек, настраивает ежедневное резервное копирование БД в cron и запускает Docker Compose стек инфраструктуры.
 
 ### CI/CD: автоматическая доставка
-Пайплайн в [.gitlab-ci.yml](file:///D:/infrastructure-blueprint/.gitlab-ci.yml) разделен на 3 стадии:
+Пайплайн в [.gitlab-ci.yml](./.gitlab-ci.yml) разделен на 3 стадии:
 1.  **`lint`**: Проверяет работоспособность докер-сокета раннера.
 2.  **`build`**: Собирает Docker-образ приложения и пушит его в GitLab Container Registry (триггерится только при изменении файлов в `app/`).
 3.  **`deploy`**: Подключается к серверу по SSH, копирует конфигурации балансировщика, скачивает новую версию образа и перезапускает веб-приложение без простоя.
 
 ### Резервное копирование
-Ежедневно в 03:00 cron запускает скрипт [backup.sh](file:///D:/infrastructure-blueprint/ansible/files/backup.sh). Скрипт делает сжатый дамп базы PostgreSQL, сохраняет его в директорию `/var/backups/postgres/` и производит ротацию — удаляет бэкапы старше 3 дней для экономии места.
+Ежедневно в 03:00 cron запускает скрипт [backup.sh](./ansible/files/backup.sh). Скрипт делает сжатый дамп базы PostgreSQL, сохраняет его в директорию `/var/backups/postgres/` и производит ротацию — удаляет бэкапы старше 3 дней для экономии места.
 
 ### Мониторинг и алертинг
 *   **Сбор метрик:** Prometheus опрашивает Node Exporter (метрики CPU/RAM/диска), самого себя и эндпоинты веб-приложений (`/metrics`) на обеих нодах.
@@ -126,7 +126,7 @@ ansible-playbook -i ansible/inventory/hosts.ini ansible/playbooks/deploy_infra.y
 
 ## Трудности и решения
 
-Ниже представлены ключевые технические проблемы, решенные в ходе реализации проекта. Подробный разбор ошибок доступен в файле [troubleshooting.md](file:///D:/infrastructure-blueprint/docs/troubleshooting.md).
+Ниже представлены ключевые технические проблемы, решенные в ходе реализации проекта. Подробный разбор ошибок доступен в файле [troubleshooting.md](./docs/troubleshooting.md).
 
 <details>
 <summary><b>1. Ошибка валидации SSH-ключа на раннере GitLab (invalid format)</b></summary>

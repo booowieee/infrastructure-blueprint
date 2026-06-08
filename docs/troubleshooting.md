@@ -38,7 +38,7 @@ bootstrap check failure [1] of [1]: max virtual memory areas vm.max_map_count [6
 По умолчанию операционная система Ubuntu ограничивает количество областей виртуальной памяти для процессов значением 65530. Для работы Elasticsearch этого недостаточно, ему требуется минимум 262144.
 
 ### Решение
-В плейбук настройки сервера [setup_server.yml](file:///D:/infrastructure-blueprint/ansible/playbooks/setup_server.yml) добавлена задача, увеличивающая лимит через модуль ядра `sysctl` с флагом сохранения изменений после перезагрузки:
+В плейбук настройки сервера [setup_server.yml](../ansible/playbooks/setup_server.yml) добавлена задача, увеличивающая лимит через модуль ядра `sysctl` с флагом сохранения изменений после перезагрузки:
 ```yaml
 - name: Set vm.max_map_count for Elasticsearch
   sysctl:
@@ -62,7 +62,7 @@ Error response from daemon: network app-network declared as external, but could 
 Поскольку приложение и вспомогательная инфраструктура (база данных, логи, мониторинг) разделены на два разных Docker Compose стека, они общаются через общую внешнюю сеть `app-network`. Если эта сеть не создана до запуска Compose-файла приложения, Docker не может запустить контейнеры.
 
 ### Решение
-Создание внешней сети `app-network` добавлено в Ansible-плейбук подготовки хоста [setup_server.yml](file:///D:/infrastructure-blueprint/ansible/playbooks/setup_server.yml) через модуль `docker_network`. Сеть создается один раз при первоначальной настройке сервера.
+Создание внешней сети `app-network` добавлено в Ansible-плейбук подготовки хоста [setup_server.yml](../ansible/playbooks/setup_server.yml) через модуль `docker_network`. Сеть создается один раз при первоначальной настройке сервера.
 ```yaml
 - name: Create shared Docker network
   docker_network:
