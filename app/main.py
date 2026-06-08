@@ -74,7 +74,7 @@ def home():
         </style>
     </head>
     <body>
-        <h1>Infrastructure Control Panel</h1>
+        <h1>[ Infrastructure Control Panel ]</h1>
         <p>Request processed by container (node): <span class="node">{{ node_name }}</span></p>
         <form action="/add" method="POST">
             <input type="text" name="name" placeholder="Server Name" required>
