@@ -1,0 +1,66 @@
+stages:
+  - lint
+  - build
+  - deploy
+
+# ---------------------------------------------------------------------------
+# Reusable SSH Agent Setup Template
+# ---------------------------------------------------------------------------
+.ssh_setup: &ssh_setup
+  before_script:
+    - apk add --no-cache openssh-client
+    - eval $(ssh-agent -s)
+    - chmod 600 "$SSH_PRIVATE_KEY"
+    - ssh-add "$SSH_PRIVATE_KEY"
+    - mkdir -p ~/.ssh
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+
+# ---------------------------------------------------------------------------
+# Stage: lint
+# Basic verification: runner availability, Docker socket validation
+# ---------------------------------------------------------------------------
+check-docker:
+  stage: lint
+  image: docker:24.0.5
+  script:
+    - docker info --format '{{.ServerVersion}}'
+
+# ---------------------------------------------------------------------------
+# Stage: build
+# Build application Docker image and push to GitLab Container Registry
+# ---------------------------------------------------------------------------
+build-image:
+  stage: build
+  image: docker:24.0.5
+  rules:
+    - changes:
+        - app/**/*
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - docker build -t "$CI_REGISTRY_IMAGE:latest" ./app
+    - docker push "$CI_REGISTRY_IMAGE:latest"
+
+# ---------------------------------------------------------------------------
+# Stage: deploy
+# Deliver and deploy the updated application stack to the production server
+# ---------------------------------------------------------------------------
+deploy-app:
+  stage: deploy
+  image: docker:24.0.5
+  <<: *ssh_setup
+  rules:
+    - changes:
+        - app/**/*
+        - nginx/**/*
+        - docker-compose.app.yml
+  script:
+    - ssh "$DEPLOY_USER@$DEPLOY_HOST" "mkdir -p ~/app/nginx"
+    - scp docker-compose.app.yml "$DEPLOY_USER@$DEPLOY_HOST:~/app/"
+    - scp nginx/nginx.conf "$DEPLOY_USER@$DEPLOY_HOST:~/app/nginx/"
+    - |
+      ssh "$DEPLOY_USER@$DEPLOY_HOST" "
+        docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY &&
+        cd ~/app &&
+        docker compose -f docker-compose.app.yml pull &&
+        docker compose -f docker-compose.app.yml up -d
+      "
