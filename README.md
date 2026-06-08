@@ -1,6 +1,6 @@
 # Infrastructure Blueprint
 
-![GitLab Pipeline](https://img.shields.io/gitlab/pipeline-status/booowieee%2Finfrastructure-blueprint?branch=main&label=pipeline)
+![GitLab Pipeline](https://img.shields.io/gitlab/pipeline-status/booowieee%2Finfrastructure-blueprint?branch=master&label=pipeline)
 ![Docker](https://img.shields.io/badge/Docker-24.0-2496ED?logo=docker&logoColor=white)
 ![Ansible](https://img.shields.io/badge/Ansible-2.x-EE0000?logo=ansible&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3.10-3776AB?logo=python&logoColor=white)
