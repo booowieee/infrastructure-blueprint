@@ -60,7 +60,7 @@ def home():
     <!DOCTYPE html>
     <html>
     <head>
-        <title>DevOps Portfolio</title>
+        <title>DevOps Portfolio by booowieee</title>
         <style>
             body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f6f9; }
             h1 { color: #333; }
